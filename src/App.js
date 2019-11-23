@@ -1,32 +1,48 @@
 import React from 'react';
+import axios from 'axios';
+import "./App.css";
+import Movie from './movie';
 
-function Food({name}){
-  return <h3>I like {name}</h3>;
-}
+//
+class App extends React.Component {
+  state = {
+    isLoading: true,
+    movies: []
+  };
 
+  getMovies = async () => {
+    const { data: { data: { movies } } } = await axios.get('https://yts-proxy.now.sh/list_movies.json?sort_by=rating');
+    console.log(movies);
+    this.setState({ movies: movies, isLoading: false });
+  }
 
-const foodIlike =[
-  {id:1, a: '1sdf23'},
-  {id:2 , a: '345sdf345'},
-  {id:3 , a: '234gsdfdfs'},
-  {id:4 , a: '234ghfsdfhd'}
-];
+  componentDidMount() {
+    this.getMovies();
 
+  }
 
-function renderFood(dish){
-  
-  return <Food key = {dish.id} name={dish.a} />
-}
+  render() {
+    console.log("rendering");
+    const { isLoading, movies } = this.state;
+    return (
+      <section class="container">
+        {isLoading ? (
+          <div class="loader">
+            <span class="loader__text">Loading...</span>
+          </div>
+        ) : (<div class="movies">
+          {movies.map(movie => {
+            console.log(movie);
+            return <Movie id={movie.id} year={movie.year} title={movie.title} summary={movie.summary} poster={movie.medium_cover_image} />
+          })
+          }
+        </div>
+          )
+        }
+      </section>
 
-
-function App() {
-  return (
-    <div className="App">
-      <h1>HEllo!!!</h1>
-      {console.log(foodIlike.map(renderFood))}
-      {foodIlike.map(renderFood)}
-    </div>
-  );
+    )
+  }
 }
 
 export default App;
